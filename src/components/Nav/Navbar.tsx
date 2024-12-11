@@ -4,8 +4,6 @@ import { MdMenu, MdClose } from 'react-icons/md'
 import NavItem from './NavItem'
 import { Link, useNavigate } from 'react-router'
 
-
-
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false)
     const navigate = useNavigate()
@@ -19,12 +17,13 @@ export default function Navbar() {
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <Link to="/">
-                                <h1>Logo</h1>
+                                <h1>WordCraft</h1>
                             </Link>
                         </div>
                         <div className="hidden md:block">
                             <div className="ml-10 flex items-baseline space-x-4">
-                                <NavItem href="/tutorial">Tutorial</NavItem>
+                                <NavItem href="/">Lessons</NavItem>
+                                <NavItem href="/tutorial">Tutorials</NavItem>
                             </div>
                         </div>
                     </div>
