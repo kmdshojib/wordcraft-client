@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button, Drawer } from 'antd'
 import { MdMenu, MdClose } from 'react-icons/md'
 import NavItem from './NavItem'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 
 
 
@@ -13,19 +13,18 @@ export default function Navbar() {
     const closeDrawer = () => setIsOpen(false)
 
     return (
-        <nav className="bg-white shadow-lg">
+        <nav className="bg-white shadow-lg fixed w-full z-[100]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
-                            <h1>Logo</h1>
+                            <Link to="/">
+                                <h1>Logo</h1>
+                            </Link>
                         </div>
                         <div className="hidden md:block">
                             <div className="ml-10 flex items-baseline space-x-4">
-                                <NavItem href="#home">Home</NavItem>
-                                <NavItem href="#about">About</NavItem>
-                                <NavItem href="#services">Services</NavItem>
-                                <NavItem href="#contact">Contact</NavItem>
+                                <NavItem href="/tutorial">Tutorial</NavItem>
                             </div>
                         </div>
                     </div>
@@ -77,13 +76,23 @@ export default function Navbar() {
                     <div className="border-t border-gray-200 p-4">
                         <Button
                             type="primary"
-                            className="w-full bg-rose-500 hover:bg-rose-600 border-rose-500 hover:border-rose-600 text-white font-bold"
+                            className="w-full bg-rose-500 hover:bg-rose-600 border-rose-500 hover:border-rose-600 text-white font-bold mb-2"
                             onClick={() => {
                                 navigate("/register")
                                 closeDrawer()
                             }}
                         >
                             Sign Up
+                        </Button>
+                        <Button
+                            type="default"
+                            className="w-full text-black font-bold"
+                            onClick={() => {
+                                navigate("/login")
+                                closeDrawer()
+                            }}
+                        >
+                            Login
                         </Button>
                     </div>
                 </div>
