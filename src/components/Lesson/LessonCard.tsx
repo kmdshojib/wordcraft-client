@@ -1,8 +1,9 @@
-import { useState } from 'react'
-import { Card } from 'antd'
-import { motion } from 'framer-motion'
+import React, { useState } from 'react';
+import { Card } from 'antd';
+import { motion } from 'framer-motion';
+
 const LessonCard = ({ lesson, index }: any) => {
-    const [isHovered, setIsHovered] = useState(false)
+    const [isHovered, setIsHovered] = useState(false);
 
     return (
         <motion.div
@@ -23,7 +24,7 @@ const LessonCard = ({ lesson, index }: any) => {
                         transition={{ duration: 0.5 }}
                         className="text-5xl mb-4 text-rose-500"
                     >
-                        {<lesson.icon />}
+                        {lesson.icon && React.createElement(lesson.icon)} {/* Render as React component */}
                     </motion.div>
                     <h3 className="text-xl font-semibold text-gray-800 mb-2">{lesson.title}</h3>
                     <motion.div
@@ -35,6 +36,7 @@ const LessonCard = ({ lesson, index }: any) => {
                 </div>
             </Card>
         </motion.div>
-    )
-}
-export default LessonCard
+    );
+};
+
+export default LessonCard;

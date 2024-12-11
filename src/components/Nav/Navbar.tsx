@@ -3,13 +3,18 @@ import { Button, Drawer } from 'antd'
 import { MdMenu, MdClose } from 'react-icons/md'
 import NavItem from './NavItem'
 import { Link, useNavigate } from 'react-router'
+import { useAppContext } from '../../hooks/useAppContext'
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false)
     const navigate = useNavigate()
     const showDrawer = () => setIsOpen(true)
     const closeDrawer = () => setIsOpen(false)
-
+    const { user, setUser } = useAppContext()
+    const logout = () => {
+        setUser(null)
+        navigate('/login')
+    }
     return (
         <nav className="bg-white shadow-lg fixed w-full z-[100]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,22 +32,33 @@ export default function Navbar() {
                             </div>
                         </div>
                     </div>
-                    <div className="hidden md:block">
-                        <Button
-                            onClick={() => navigate("/login")}
-                            type="default"
-                            className="text-black font-bold mr-3"
-                        >
-                            Login
-                        </Button>
-                        <Button
-                            onClick={() => navigate("/register")}
-                            className="bg-rose-500 hover:bg-rose-600 border-rose-500 hover:border-rose-600 text-white font-bold"
-                        >
-                            Sign Up
-                        </Button>
+                    {
+                        user ? <div className='hidden md:block'>
+                            <Button
+                                onClick={logout}
+                                type="default"
+                                className="text-black font-bold mr-3"
+                            >
+                                Logout
+                            </Button>
+                        </div> : <div className="hidden md:block">
+                            <Button
+                                onClick={() => navigate("/login")}
+                                type="default"
+                                className="text-black font-bold mr-3"
+                            >
+                                Login
+                            </Button>
+                            <Button
+                                onClick={() => navigate("/register")}
+                                className="bg-rose-500 hover:bg-rose-600 border-rose-500 hover:border-rose-600 text-white font-bold"
+                            >
+                                Sign Up
+                            </Button>
 
-                    </div>
+                        </div>
+                    }
+
 
                     <div className="-mr-2 flex md:hidden">
                         <Button

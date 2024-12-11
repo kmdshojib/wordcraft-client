@@ -4,6 +4,8 @@ import Registration from "../pages/Registration";
 import LessonHome from "../pages/LessonHome";
 import TutorialPage from "../pages/TutorialPage";
 import LessonPage from "../pages/LessonPage";
+import AdminPage from "../pages/Admin";
+
 
 type AppRoute = {
     path: string;
@@ -13,9 +15,13 @@ type AppRoute = {
 
 
 export const routes: AppRoute[] = [
-    { path: "/", element: LessonHome },
     { path: "/login", element: Login },
     { path: "/register", element: Registration },
-    { path: "/tutorial", element: TutorialPage },
-    { path: "/lesson/:id", element: LessonPage}
+    {path: "/admin/dashboard", element: AdminPage}
 ];
+
+export const secureRoutes: AppRoute[] = [
+    { path: "/", element: LessonHome },
+    { path: "/tutorial", element: TutorialPage },
+    { path: "/lesson/:id", element: LessonPage },
+]

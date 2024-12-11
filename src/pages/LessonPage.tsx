@@ -1,68 +1,98 @@
-
-import { useState, useEffect } from 'react'
-import { Button, Card, message } from 'antd'
-import { motion } from 'framer-motion'
-import Confetti from 'react-confetti'
-import { FaVolumeUp, FaArrowLeft, FaArrowRight, FaCheck } from 'react-icons/fa'
+import { useState, useEffect } from 'react';
+import { Button, Card, message, Skeleton } from 'antd';
+import { motion } from 'framer-motion';
+import Confetti from 'react-confetti';
+import { FaVolumeUp, FaArrowLeft, FaArrowRight, FaCheck } from 'react-icons/fa';
 import { useNavigate } from 'react-router';
-import { useParams } from 'react-router'
-
-// Mock vocabulary data (replace with actual data fetching in a real application)
-const mockVocabulary = [
-    { id: 1, word: 'こんにちは', pronunciation: 'Konnichiwa', meaning: 'Hello', whenToSay: 'Greeting during the day' },
-    { id: 2, word: 'ありがとう', pronunciation: 'Arigatou', meaning: 'Thank you', whenToSay: 'Expressing gratitude' },
-    { id: 3, word: 'さようなら', pronunciation: 'Sayounara', meaning: 'Goodbye', whenToSay: 'Parting ways' },
-]
+import { useParams } from 'react-router';
+import { getVocab } from '../api/lessonService';
 
 const LessonPage = () => {
-    const {id} = useParams()
-    console.log(id)
-    const [currentIndex, setCurrentIndex] = useState(0)
-    const [isCompleted, setIsCompleted] = useState(false)
-    const [showConfetti, setShowConfetti] = useState(false)
-    const navigate = useNavigate()
+    const { id } = useParams();
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [title,setTitle] = useState<string | null>("");
+    const [vocabulary, setVocabulary] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [isCompleted, setIsCompleted] = useState(false);
+    const [showConfetti, setShowConfetti] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchVocabulary = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const data = await getVocab(id as string);
+                setTitle(data.title);
+                setVocabulary(data.vocabulary);
+            } catch (err) {
+                setError('Failed to fetch vocabulary. Please try again later.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchVocabulary();
+    }, [id]);
 
     useEffect(() => {
         if (showConfetti) {
             const timer = setTimeout(() => {
-                setShowConfetti(false)
-                navigate('/lessons')
-            }, 5000)
-            return () => clearTimeout(timer)
+                setShowConfetti(false);
+                navigate('/');
+            }, 5000);
+            return () => clearTimeout(timer);
         }
-    }, [showConfetti, navigate])
-
-    const currentVocab = mockVocabulary[currentIndex]
+    }, [showConfetti, navigate]);
 
     const playPronunciation = () => {
-        const utterance = new SpeechSynthesisUtterance(currentVocab.pronunciation)
-        utterance.lang = 'ja-JP'
-        speechSynthesis.speak(utterance)
-    }
+        const currentVocab: any = vocabulary[currentIndex];
+        const utterance = new SpeechSynthesisUtterance(currentVocab.pronunciation);
+        utterance.lang = 'ja-JP';
+        speechSynthesis.speak(utterance);
+    };
 
     const handleNext = () => {
-        if (currentIndex < mockVocabulary.length - 1) {
-            setCurrentIndex(currentIndex + 1)
+        if (currentIndex < vocabulary.length - 1) {
+            setCurrentIndex(currentIndex + 1);
         } else {
-            setIsCompleted(true)
+            setIsCompleted(true);
         }
-    }
+    };
 
     const handlePrevious = () => {
         if (currentIndex > 0) {
-            setCurrentIndex(currentIndex - 1)
+            setCurrentIndex(currentIndex - 1);
         }
-    }
+    };
 
     const handleComplete = () => {
-        setShowConfetti(true)
-        message.success('Lesson completed!')
+        setShowConfetti(true);
+        message.success('Lesson completed!');
+    };
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-rose-100">
+                <Skeleton active paragraph={{ rows: 4 }} className="w-full max-w-2xl mx-auto" />
+            </div>
+        );
     }
 
+    if (error) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-rose-100">
+                <p className="text-red-500 text-xl">{error}</p>
+            </div>
+        );
+    }
+
+    const currentVocab: any = vocabulary[currentIndex];
+
     return (
-        <div className="min-h-screen bg-gradient-to-b from-white to-rose-100 py-12">
+        <div className="min-h-screen bg-gradient-to-b from-white to-rose-100 py-12 pt-15">
             <div className="container mx-auto px-4">
-                <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">Lesson {}</h1>
+                <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center pt-10">{title} Lesson</h1>
                 <Card className="w-full max-w-2xl mx-auto">
                     <motion.div
                         key={currentVocab.id}
@@ -94,19 +124,18 @@ const LessonPage = () => {
                         </Button>
                         {isCompleted ? (
                             <Button
-                                type="primary"
                                 icon={<FaCheck />}
                                 onClick={handleComplete}
-                                className="bg-rose-500 hover:bg-rose-600 border-rose-500"
+                                className="bg-rose-500 hover:bg-rose-600 border-rose-500 text-white"
                             >
                                 Complete Lesson
                             </Button>
                         ) : (
                             <Button
-                                type="primary"
+           
                                 icon={<FaArrowRight />}
                                 onClick={handleNext}
-                                className="bg-rose-500 hover:bg-rose-600 border-rose-500"
+                                className="bg-rose-500 hover:bg-rose-600 border-rose-500 text-white"
                             >
                                 Next
                             </Button>
@@ -116,8 +145,7 @@ const LessonPage = () => {
             </div>
             {showConfetti && <Confetti />}
         </div>
-    )
-}
+    );
+};
 
-export default LessonPage
-
+export default LessonPage;
