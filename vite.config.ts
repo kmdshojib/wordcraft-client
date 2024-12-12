@@ -8,9 +8,5 @@ export default defineConfig({
       alias: {
           '@': '/src',
       },
-  },
-  build: {
-    outDir: 'dist', 
-    sourcemap: true,
-  },
+  }
 });
