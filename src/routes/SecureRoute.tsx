@@ -1,7 +1,7 @@
-import { ReactNode, FC, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import { useAppContext } from "../hooks/useAppContext";
-import { message } from "antd";
+import { ReactNode, FC } from "react";
+// import { useNavigate } from "react-router";
+// import { useAppContext } from "../hooks/useAppContext";
+// import { message } from "antd";
 
 interface SecureRouteProps {
     children: ReactNode;
