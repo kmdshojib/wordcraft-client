@@ -8,22 +8,22 @@ interface SecureRouteProps {
 }
 
 const SecureRoute: FC<SecureRouteProps> = ({ children }) => {
-    const { user }: any = useAppContext();
-    const navigate = useNavigate();
-    const [isAuthorized, setIsAuthorized] = useState(false);
+    // const { user }: any = useAppContext();
+    // const navigate = useNavigate();
+    // const [isAuthorized, setIsAuthorized] = useState(false);
 
-    useEffect(() => {
-        if (!user) {
-            message.error("Please login to access this page.");
-            navigate("/", { replace: true });
-        } else {
-            setIsAuthorized(true);
-        }
-    }, [user, navigate]);
+    // useEffect(() => {
+    //     if (!user) {
+    //         message.error("Please login to access this page.");
+    //         navigate("/", { replace: true });
+    //     } else {
+    //         setIsAuthorized(true);
+    //     }
+    // }, [user, navigate]);
 
-    if (!isAuthorized) {
-        return null; // Or return a loading spinner if you prefer
-    }
+    // if (!isAuthorized) {
+    //     return null; // Or return a loading spinner if you prefer
+    // }
 
     return <>{children}</>;
 };
