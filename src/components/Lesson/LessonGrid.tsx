@@ -4,10 +4,11 @@ import LessonCard from './LessonCard';
 import { getLessons } from '../../api/lessonService';
 import { Alert } from 'antd';
 import * as Icons from 'react-icons/fa';
+
 type Lesson = {
     _id: number;
     title: string;
-    icon: string; 
+    icon: string;
 };
 
 const LessonGrid = () => {
@@ -62,6 +63,19 @@ const LessonGrid = () => {
         return (
             <div className="container mx-auto px-4 py-12">
                 <Alert message="Error" description={error} type="error" showIcon />
+            </div>
+        );
+    }
+
+    if (lessons.length === 0) {
+        return (
+            <div className="container mx-auto px-4 py-12">
+                <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+                    (<span className="text-rose-500">日本</span>)Japanese Vocabulary Lessons
+                </h2>
+                <div className="text-center text-gray-600">
+                    No lessons available at the moment. Please check back later.
+                </div>
             </div>
         );
     }
