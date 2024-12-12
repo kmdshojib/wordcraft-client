@@ -45,7 +45,7 @@ const LessonPage = () => {
         if (showConfetti) {
             const timer = setTimeout(() => {
                 setShowConfetti(false);
-                navigate('/');
+                navigate('/lessons');
             }, 5000);
             return () => clearTimeout(timer);
         }
