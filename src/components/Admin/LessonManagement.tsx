@@ -1,27 +1,50 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Table, Button, Modal, Form, Input, message, Popconfirm } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { Table, Button, Modal, Form, Input, message, Popconfirm, Select } from 'antd'
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa'
+import { createLessonCategory, deleteLessonCategory, getLessons, updateLessonCategory } from '../../api/lessonService'
+import * as Icons from 'react-icons/fa'
+import { useAppContext } from '../../hooks/useAppContext'
 
-interface Lesson {
-    id: string
-    title: string
-    icon: string
-    vocabularyCount: number
+type Lesson = {
+    _id: number;
+    title: string;
+    icon: string;
 }
 
-const initialLessons: Lesson[] = [
-    { id: '1', title: 'Basic Greetings', icon: '👋', vocabularyCount: 10 },
-    { id: '2', title: 'Numbers', icon: '🔢', vocabularyCount: 20 },
-    { id: '3', title: 'Colors', icon: '🎨', vocabularyCount: 15 },
-]
+const { Option } = Select
 
 const LessonManagement: React.FC = () => {
-    const [lessons, setLessons] = useState<Lesson[]>(initialLessons)
+    const { user }: any = useAppContext()
+
+    const [lessons, setLessons] = useState<Lesson[]>([])
     const [isModalVisible, setIsModalVisible] = useState(false)
     const [form] = Form.useForm()
     const [editingLesson, setEditingLesson] = useState<Lesson | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+
+    useEffect(() => {
+        fetchLessons()
+    }, [])
+
+    const fetchLessons = async () => {
+        try {
+            setLoading(true)
+            setError(null)
+            const data: Lesson[] = await getLessons()
+            const formattedLessons = data.map((lesson: Lesson) => ({
+                ...lesson,
+                iconComponent: (Icons as any)[lesson.icon] || null,
+            }))
+            setLessons(formattedLessons)
+        } catch (error) {
+            setError('Failed to load lessons. Please try again later.')
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const showModal = (lesson?: Lesson) => {
         if (lesson) {
@@ -34,31 +57,33 @@ const LessonManagement: React.FC = () => {
         setIsModalVisible(true)
     }
 
-    const handleOk = () => {
-        form.validateFields().then((values) => {
+    const handleOk = async () => {
+        try {
+            const values = await form.validateFields()
+
             if (editingLesson) {
-                setLessons(prevLessons =>
-                    prevLessons.map(lesson =>
-                        lesson.id === editingLesson.id ? { ...lesson, ...values } : lesson
-                    )
-                )
+                await updateLessonCategory(editingLesson._id, values)
                 message.success('Lesson updated successfully')
             } else {
-                const newLesson: Lesson = {
-                    id: Date.now().toString(),
-                    ...values,
-                    vocabularyCount: 0
-                }
-                setLessons(prevLessons => [...prevLessons, newLesson])
+                const newLessonData = { ...values, createdBy: user.email }
+                await createLessonCategory(newLessonData)
                 message.success('Lesson created successfully')
             }
             setIsModalVisible(false)
-        })
+            fetchLessons()
+        } catch (error) {
+            message.error('Failed to save lesson')
+        }
     }
 
-    const handleDelete = (id: string) => {
-        setLessons(prevLessons => prevLessons.filter(lesson => lesson.id !== id))
-        message.success('Lesson deleted successfully')
+    const handleDelete = async (id: number) => {
+        try {
+            await deleteLessonCategory(id)
+            message.success('Lesson deleted successfully')
+            fetchLessons()
+        } catch (error) {
+            message.error('Failed to delete lesson')
+        }
     }
 
     const columns = [
@@ -71,11 +96,10 @@ const LessonManagement: React.FC = () => {
             title: 'Icon',
             dataIndex: 'icon',
             key: 'icon',
-        },
-        {
-            title: 'Vocabulary Count',
-            dataIndex: 'vocabularyCount',
-            key: 'vocabularyCount',
+            render: (icon: string, record: any) => {
+                const IconComponent = record.iconComponent
+                return IconComponent ? <IconComponent /> : icon
+            },
         },
         {
             title: 'Actions',
@@ -85,7 +109,7 @@ const LessonManagement: React.FC = () => {
                     <Button icon={<FaEdit />} onClick={() => showModal(record)} className="mr-2" />
                     <Popconfirm
                         title="Are you sure you want to delete this lesson?"
-                        onConfirm={() => handleDelete(record.id)}
+                        onConfirm={() => handleDelete(record._id)}
                         okText="Yes"
                         cancelText="No"
                     >
@@ -95,6 +119,14 @@ const LessonManagement: React.FC = () => {
             ),
         },
     ]
+
+    if (loading) {
+        return <div>Loading...</div>
+    }
+
+    if (error) {
+        return <div>{error}</div>
+    }
 
     return (
         <div className="p-6">
@@ -106,7 +138,13 @@ const LessonManagement: React.FC = () => {
             >
                 Create Lesson
             </Button>
-            <Table columns={columns} dataSource={lessons} rowKey="id" />
+            <Table 
+                columns={columns} 
+                dataSource={lessons} 
+                rowKey="_id"
+                scroll={{ x: true }}
+                // responsive={['md']}
+            />
             <Modal
                 title={editingLesson ? 'Edit Lesson' : 'Create Lesson'}
                 open={isModalVisible}
@@ -124,9 +162,15 @@ const LessonManagement: React.FC = () => {
                     <Form.Item
                         name="icon"
                         label="Icon"
-                        rules={[{ required: true, message: 'Please input the icon!' }]}
+                        rules={[{ required: true, message: 'Please select an icon!' }]}
                     >
-                        <Input />
+                        <Select>
+                            {Object.keys(Icons).map((iconName) => (
+                                <Option key={iconName} value={iconName}>
+                                    {React.createElement((Icons as any)[iconName])} {iconName}
+                                </Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                 </Form>
             </Modal>

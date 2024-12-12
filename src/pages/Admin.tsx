@@ -1,10 +1,29 @@
-import React from 'react'
-import { Tabs } from 'antd'
-import { FaBook, FaLanguage } from 'react-icons/fa'
+import React, { useEffect, useRef } from 'react'
+import { message, Tabs } from 'antd'
+import { FaBook, FaLanguage, FaUsers } from 'react-icons/fa'
 import VocabularyManagement from '../components/Admin/VocabularyManagement'
 import LessonManagement from '../components/Admin/LessonManagement'
+import UserManagement from '../components/Admin/UserManagement'
+import { useAppContext } from '../hooks/useAppContext'
+import { useNavigate } from 'react-router'
 
 const AdminPage: React.FC = () => {
+    const { user }: any = useAppContext();
+    const navigate = useNavigate();
+    const hasRedirected = useRef(false);
+
+    useEffect(() => {
+        if (user.role !== "admin" && !hasRedirected.current) {
+            hasRedirected.current = true;
+            message.error("Only admin can access this page.");
+            navigate("/");
+        }
+    }, [user, navigate]);
+
+    if (user.role !== "admin") {
+        return null;
+    }
+
     const items = [
         {
             key: '1',
@@ -24,12 +43,25 @@ const AdminPage: React.FC = () => {
             ),
             children: <VocabularyManagement />,
         },
+        {
+            key: '3',
+            label: (
+                <span>
+                    <FaUsers /> User Management
+                </span>
+            ),
+            children: <UserManagement />,
+        },
     ]
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
-            <Tabs defaultActiveKey="1" items={items} />
+        <div className="container mx-auto p-4 pt-20">
+            <h1 className="text-2xl font-bold mb-4 text-center">Admin Dashboard</h1>
+            <Tabs 
+                defaultActiveKey="1" 
+                items={items}
+                tabPosition={window.innerWidth < 768 ? 'top' : 'left'}
+            />
         </div>
     )
 }

@@ -17,11 +17,12 @@ type AppRoute = {
 export const routes: AppRoute[] = [
     { path: "/login", element: Login },
     { path: "/register", element: Registration },
-    {path: "/admin/dashboard", element: AdminPage}
 ];
 
 export const secureRoutes: AppRoute[] = [
+    { path: "/dashboard", element: AdminPage },
     { path: "/", element: LessonHome },
     { path: "/tutorial", element: TutorialPage },
     { path: "/lesson/:id", element: LessonPage },
+   
 ]
