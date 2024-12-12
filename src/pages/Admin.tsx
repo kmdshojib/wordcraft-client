@@ -56,7 +56,7 @@ const AdminPage: React.FC = () => {
 
     return (
         <div className="container mx-auto p-4 pt-20">
-            <h1 className="text-2xl font-bold mb-4 text-center">Admin Dashboard</h1>
+            <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
             <Tabs 
                 defaultActiveKey="1" 
                 items={items}

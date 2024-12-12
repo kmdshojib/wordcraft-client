@@ -4,10 +4,12 @@ import { FaEnvelope, FaLock } from 'react-icons/fa';
 import { useAppContext } from '../hooks/useAppContext';
 import { userLogin } from '../api/authService';
 import { Link, useNavigate } from 'react-router';
+import useTitle from '../hooks/useTitle';
 
 const { Item } = Form;
 
 const Login: FC = () => {
+    useTitle("Word Craft | Login")
     const { setUser }: any = useAppContext();
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -19,7 +21,7 @@ const Login: FC = () => {
             if (res.statusCode === 200) {
                 setUser(res.data);
                 message.success(res.message);
-                navigate(res.data.role === 'admin' ? '/dashboard' : '/');
+                navigate(res.data.role === 'admin' ? '/dashboard' : '/lessons');
             } else {
                 message.error(res.message || 'Login failed');
             }
@@ -62,7 +64,6 @@ const Login: FC = () => {
                     </Item>
                     <Item>
                         <Button
-                            type="primary"
                             htmlType="submit"
                             loading={loading}
                             className="w-full bg-rose-500 hover:bg-rose-600 border-rose-500 hover:border-rose-600 text-white rounded-md"

@@ -6,11 +6,13 @@ import { FaVolumeUp, FaArrowLeft, FaArrowRight, FaCheck } from 'react-icons/fa';
 import { useNavigate } from 'react-router';
 import { useParams } from 'react-router';
 import { getVocab } from '../api/lessonService';
+import useTitle from '../hooks/useTitle';
 
 const LessonPage = () => {
+    useTitle("Word Craft | Vocabulary")
     const { id } = useParams();
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [title,setTitle] = useState<string | null>("");
+    const [title, setTitle] = useState<string | null>("");
     const [vocabulary, setVocabulary] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -24,8 +26,12 @@ const LessonPage = () => {
             setError(null);
             try {
                 const data = await getVocab(id as string);
-                setTitle(data.title);
-                setVocabulary(data.vocabulary);
+                if (data.vocabulary && data.vocabulary.length > 0) {
+                    setTitle(data.title);
+                    setVocabulary(data.vocabulary);
+                } else {
+                    setError('No vocabulary found in this lesson.');
+                }
             } catch (err) {
                 setError('Failed to fetch vocabulary. Please try again later.');
             } finally {
@@ -132,7 +138,6 @@ const LessonPage = () => {
                             </Button>
                         ) : (
                             <Button
-           
                                 icon={<FaArrowRight />}
                                 onClick={handleNext}
                                 className="bg-rose-500 hover:bg-rose-600 border-rose-500 text-white"

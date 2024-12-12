@@ -1,5 +1,6 @@
-import axios  from "axios";
-
-export const axiosInstance= axios.create({
-    baseURL: "http://localhost:5000/",
-  });
+import axios from "axios";
+// let baseUrl = "http://localhost:5000/"
+let baseUrl = "https://wordcraft-server-ashy.vercel.app/"
+export const axiosInstance = axios.create({
+  baseURL: baseUrl,
+});

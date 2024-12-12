@@ -93,6 +93,11 @@ const LessonManagement: React.FC = () => {
             key: 'title',
         },
         {
+            title: 'Created by',
+            dataIndex: 'createdBy',
+            key: 'createdBy',
+        },
+        {
             title: 'Icon',
             dataIndex: 'icon',
             key: 'icon',

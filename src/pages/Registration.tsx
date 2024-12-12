@@ -3,10 +3,12 @@ import { Form, Input, Button, Upload, message } from 'antd';
 import { FaUser, FaEnvelope, FaLock, FaUpload } from 'react-icons/fa';
 import { userRegistration } from '../api/authService';
 import { Link, useNavigate } from 'react-router';
+import useTitle from '../hooks/useTitle';
 
 const { Item } = Form;
 
 const Registration: FC = () => {
+    useTitle("Word Craft | Registration");
     const [form] = Form.useForm();
     const [fileList, setFileList] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -128,7 +130,7 @@ const Registration: FC = () => {
                         </Button>
                     </Item>
                     <p className="px-6 text-sm text-center dark:text-gray-600">Have an account yet?
-                        <Link rel="noopener noreferrer" to="/login" className="hover:underline hover:text-rose-500">Login</Link>.
+                        <Link rel="noopener noreferrer" to="/" className="hover:underline hover:text-rose-500">Login</Link>.
                     </p>
                 </Form>
             </div>

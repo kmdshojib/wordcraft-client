@@ -1,5 +1,5 @@
-import { ReactNode, FC, useRef } from "react";
-import { Navigate } from "react-router";
+import { ReactNode, FC, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { useAppContext } from "../hooks/useAppContext";
 import { message } from "antd";
 
@@ -9,20 +9,20 @@ interface SecureRouteProps {
 
 const SecureRoute: FC<SecureRouteProps> = ({ children }) => {
     const { user }: any = useAppContext();
-    const hasShownMessage = useRef(false);
+    const navigate = useNavigate();
+    const [isAuthorized, setIsAuthorized] = useState(false);
 
-    if (!user) {
-        if (!hasShownMessage.current) {
+    useEffect(() => {
+        if (!user) {
             message.error("Please login to access this page.");
-            hasShownMessage.current = true;
+            navigate("/", { replace: true });
+        } else {
+            setIsAuthorized(true);
         }
-        return <Navigate to="/login" replace />;
-    }
+    }, [user, navigate]);
 
-    if (user.role === "admin") {
-        <Navigate to="/dashboard" replace />;
-    } else {
-        <Navigate to="/" replace />;
+    if (!isAuthorized) {
+        return null; // Or return a loading spinner if you prefer
     }
 
     return <>{children}</>;

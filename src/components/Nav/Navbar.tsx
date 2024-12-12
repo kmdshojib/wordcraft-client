@@ -2,18 +2,19 @@ import { useState } from 'react'
 import { Button, Drawer } from 'antd'
 import { MdMenu, MdClose } from 'react-icons/md'
 import NavItem from './NavItem'
-import { Link, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 import { useAppContext } from '../../hooks/useAppContext'
+import Logo from './Logo'
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false)
     const navigate = useNavigate()
     const showDrawer = () => setIsOpen(true)
     const closeDrawer = () => setIsOpen(false)
-    const { user, setUser } = useAppContext()
+    const { user, setUser }: any = useAppContext()
     const logout = () => {
         setUser(null)
-        navigate('/login')
+        navigate('/', { replace: true })
     }
     return (
         <nav className="bg-white shadow-lg fixed w-full z-[100]">
@@ -21,14 +22,20 @@ export default function Navbar() {
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
-                            <Link to="/">
-                                <h1>WordCraft</h1>
-                            </Link>
+                            <Logo />
                         </div>
                         <div className="hidden md:block">
                             <div className="ml-10 flex items-baseline space-x-4">
-                                <NavItem href="/">Lessons</NavItem>
-                                <NavItem href="/tutorial">Tutorials</NavItem>
+
+                                {
+                                    user && <>
+                                        <NavItem href="/lessons">Lessons</NavItem>
+                                        <NavItem href="/tutorial">Tutorials</NavItem>
+                                    </>
+                                }
+                                {
+                                    (user && user.role === 'admin') && <NavItem href="/dashboard">Dashboard</NavItem>
+                                }
                             </div>
                         </div>
                     </div>
@@ -43,7 +50,7 @@ export default function Navbar() {
                             </Button>
                         </div> : <div className="hidden md:block">
                             <Button
-                                onClick={() => navigate("/login")}
+                                onClick={() => navigate("/")}
                                 type="default"
                                 className="text-black font-bold mr-3"
                             >
@@ -82,33 +89,49 @@ export default function Navbar() {
                 <div className="flex flex-col h-full">
                     <div className="flex-1 py-6 overflow-y-auto px-4">
                         <div className="space-y-2">
-                            <NavItem href="#home" onClick={closeDrawer}>Home</NavItem>
-                            <NavItem href="#about" onClick={closeDrawer}>About</NavItem>
-                            <NavItem href="#services" onClick={closeDrawer}>Services</NavItem>
-                            <NavItem href="#contact" onClick={closeDrawer}>Contact</NavItem>
+
+                            {
+                                user && <>
+                                    <NavItem href="/lessons">Lessons</NavItem>
+                                    <NavItem href="/tutorial">Tutorials</NavItem>
+                                </>
+                            }
+                            {
+                                (user && user.role === 'admin') && <NavItem href="/dashboard">Dashboard</NavItem>
+                            }
                         </div>
                     </div>
                     <div className="border-t border-gray-200 p-4">
-                        <Button
-                            type="primary"
-                            className="w-full bg-rose-500 hover:bg-rose-600 border-rose-500 hover:border-rose-600 text-white font-bold mb-2"
-                            onClick={() => {
-                                navigate("/register")
-                                closeDrawer()
-                            }}
-                        >
-                            Sign Up
-                        </Button>
-                        <Button
-                            type="default"
-                            className="w-full text-black font-bold"
-                            onClick={() => {
-                                navigate("/login")
-                                closeDrawer()
-                            }}
-                        >
-                            Login
-                        </Button>
+                        {user ? <>
+                            <Button
+                                className="w-full text-black font-bold"
+                                onClick={logout}
+                            >
+                                Logout
+                            </Button>
+                        </> :
+                            <>
+                                <Button
+                                    className="w-full bg-rose-500 hover:bg-rose-600 border-rose-500 hover:border-rose-600 text-white font-bold mb-2"
+                                    onClick={() => {
+                                        navigate("/register")
+                                        closeDrawer()
+                                    }}
+                                >
+                                    Sign Up
+                                </Button>
+                                <Button
+                                    type="default"
+                                    className="w-full text-black font-bold"
+                                    onClick={() => {
+                                        navigate("/")
+                                        closeDrawer()
+                                    }}
+                                >
+                                    Login
+                                </Button>
+                            </>
+                        }
                     </div>
                 </div>
             </Drawer>

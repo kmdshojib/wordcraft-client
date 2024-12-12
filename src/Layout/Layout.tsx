@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router";
 import { routes, secureRoutes } from "../routes/routes";
 import Navbar from "../components/Nav/Navbar";
 import SecureRoute from "../routes/SecureRoute";
-
+import Footer from "../components/Footer/Footer";
 
 
 const Layout: FC = () => {
@@ -14,21 +14,19 @@ const Layout: FC = () => {
         {routes.map((route, index) => (
           <Route key={index} path={route.path} element={<route.element />} />
         ))}
-        {
-          secureRoutes.map((route, index) =>
-            <Route
-              key={index}
-              path={route.path}
-              element={
-                <SecureRoute>
-                  {<route.element />}
-                </SecureRoute>
-              }
-            />)
-        }
-
-
+        {secureRoutes.map((route, index) => (
+          <Route
+            key={index}
+            path={route.path}
+            element={
+              <SecureRoute>
+                <route.element />
+              </SecureRoute>
+            }
+          />
+        ))}
       </Routes>
+      <Footer />
     </div>
   );
 };
