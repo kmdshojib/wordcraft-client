@@ -1,7 +1,7 @@
 import { useState, FC } from 'react';
 import { Form, Input, Button, Upload, message } from 'antd';
 import { FaUser, FaEnvelope, FaLock, FaUpload } from 'react-icons/fa';
-import { userRegistration } from '../api/authService';
+import { userRegistration } from '../api/authService'; // Make sure this function is implemented
 import { Link, useNavigate } from 'react-router';
 import useTitle from '../hooks/useTitle';
 
@@ -16,10 +16,6 @@ const Registration: FC = () => {
 
     const onFinish = async (values: any) => {
         setLoading(true);
-        const formData = new FormData();
-        formData.append('name', values.name);
-        formData.append('email', values.email);
-        formData.append('password', values.password);
 
         if (fileList.length === 0) {
             message.error('Please upload a profile photo.');
@@ -27,22 +23,50 @@ const Registration: FC = () => {
             return;
         }
 
-        fileList.forEach((file) => {
-            formData.append('photo', file.originFileObj);
-        });
+        const formData = new FormData();
+        formData.append("file", fileList[0].originFileObj); // Cloudinary expects 'file'
+        formData.append("upload_preset", "i05gycig"); // Replace with your Cloudinary preset
 
         try {
-            const res = await userRegistration(formData);
-            if (res.statusCode === 201) {
-                message.success(res.message);
-                navigate('/login');
-                form.resetFields();
-                setFileList([]);
+            // Upload image to Cloudinary
+            const cloudinaryRes = await fetch("https://api.cloudinary.com/v1_1/dy85l0m09/image/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!cloudinaryRes.ok) {
+                throw new Error('Image upload failed');
+            }
+
+            const cloudinaryData = await cloudinaryRes.json();
+
+            if (cloudinaryData.secure_url) {
+                const photoUrl = cloudinaryData.secure_url; // Cloudinary image URL
+
+                // Prepare backend payload
+                const backendPayload = {
+                    name: values.name,
+                    email: values.email,
+                    password: values.password,
+                    photoUrl,
+                };
+
+                // Send data to backend
+                const res = await userRegistration(backendPayload);
+
+                if (res.statusCode === 201) {
+                    message.success(res.message);
+                    navigate('/'); // Redirect to login page or home page
+                    form.resetFields();
+                    setFileList([]); // Clear the file list
+                } else {
+                    message.error(res.message || 'Registration failed');
+                }
             } else {
-                message.error(res.message || 'Registration failed');
+                throw new Error('URL not found in Cloudinary response');
             }
         } catch (error: any) {
-            message.error(error.response?.data?.message || 'An error occurred during registration');
+            message.error(error.message || 'An error occurred during registration');
         } finally {
             setLoading(false);
         }
